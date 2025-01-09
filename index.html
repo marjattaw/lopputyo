@@ -10,10 +10,14 @@
     <!-- Aloitusruutu -->
     <div id="startScreen">
         <h2>Nalan ja Enzion pakoretki</h2>
-        <p>Paina välilyöntiä hyppääksesi ja väistä esteet!</p>
+        <p>Valitse hahmo:</p>
+        <div class="character-selection">
+            <button onclick="selectCharacter('blue')" class="character-button blue"></button>
+            <button onclick="selectCharacter('green')" class="character-button green"></button>
+        </div>
         <button id="startGameButton">Aloita peli</button>
     </div>
-
+    
     <!-- Canvas -->
     <canvas id="gameCanvas" width="800" height="400" style="display: none; border: 1px solid black;"></canvas>
 

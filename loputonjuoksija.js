@@ -9,6 +9,7 @@ let jumpPower = -15;
 let speed = 3;
 let score = 0;
 let obstacleSpawnRate = 0.005; // Todennäköisyys esteen ilmestymiselle
+let selectedCharacter = null; // Ei valittua hahmoa alussa
 
 // Pelaaja
 const player = {
@@ -34,17 +35,33 @@ const player = {
     }
 };
 
-// Laske pelaajan maksimihyppykaari
-function calculateJumpHeight() {
-    let jumpHeight = Math.abs(jumpPower) * (Math.abs(jumpPower) / (2 * gravity));
-    return jumpHeight;
+// Hahmon valinta
+function selectCharacter(color) {
+    selectedCharacter = color;
+    player.color = selectedCharacter;
+    alert(`Valitsit hahmon: ${color}`);
+}
+
+// Aloita peli
+function startGame() {
+    if (!selectedCharacter) {
+        alert("Valitse hahmo ennen pelin aloittamista!");
+        return;
+    }
+    document.getElementById("startScreen").style.display = "none";
+    canvas.style.display = "block";
+    isGameRunning = true;
+    score = 0;
+    player.y = canvas.height - player.height;
+    player.velocityY = 0;
+    updateGame();
 }
 
 // Esteet
 const obstacles = [];
 function createObstacle() {
-    const maxObstacleHeight = Math.min(50, canvas.height / 4); // Maksimikorkeus esteelle asetettu matalaksi
-    const height = Math.random() * maxObstacleHeight + 20; // Esteiden korkeus 20 - maxObstacleHeight
+    const maxObstacleHeight = Math.min(50, canvas.height / 4);
+    const height = Math.random() * maxObstacleHeight + 20;
     const obstacle = {
         x: canvas.width,
         y: canvas.height - height,
@@ -66,10 +83,10 @@ function createObstacle() {
 function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Piirä pelaaja
+    // Piirrä pelaaja
     player.draw();
 
-    // Piirä esteet
+    // Piirrä esteet
     obstacles.forEach(obstacle => {
         obstacle.draw();
     });
@@ -109,29 +126,11 @@ function updateGame() {
         createObstacle();
     }
 
-    // Lisää haastetta ajan myötä
-    if (score % 10 === 0 && score > 0) {
-        obstacleSpawnRate += 0.001; // Lisää esteiden ilmestymistiheyttä
-    }
-
     drawGame();
 
     if (isGameRunning) {
         requestAnimationFrame(updateGame);
     }
-}
-
-// Aloita peli
-function startGame() {
-    document.getElementById("startScreen").style.display = "none";
-    canvas.style.display = "block";
-    isGameRunning = true;
-    score = 0;
-    obstacles.length = 0;
-    player.y = canvas.height - player.height;
-    player.velocityY = 0;
-    obstacleSpawnRate = 0.005; // Palauta alkuperäinen ilmestymistiheys
-    updateGame();
 }
 
 // Lopeta peli
@@ -149,5 +148,5 @@ window.addEventListener("keydown", (e) => {
     }
 });
 
-// Aloita pelin napista
+// Aloitusnapin kuuntelija
 document.getElementById("startGameButton").addEventListener("click", startGame);
