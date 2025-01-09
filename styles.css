@@ -35,7 +35,7 @@ canvas {
     color: white;
 }
 
-/* Hahmon valinta */
+/* Hahmovalinnan kontti */
 .character-selection {
     display: flex;
     gap: 20px;
@@ -43,26 +43,25 @@ canvas {
     margin: 20px 0;
 }
 
+/* Hahmon valintanapin tyylit */
 .character-button {
-    width: 100px;
-    height: 100px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+    background: none; /* Ei taustaväriä */
+    border: none; /* Ei reunaviivaa */
+    padding: 0; /* Ei sisämarginaalia */
+    cursor: pointer; /* Vaihda osoitin käden kuvaksi hoverissa */
+    transition: transform 0.2s ease; /* Lisää pieni skaalausanimaatio */
 }
 
 .character-button:hover {
-    transform: scale(1.1);
+    transform: scale(1.1); /* Kasvata kokoa hieman hoverissa */
 }
 
-/* Hahmon värit */
-.character-button.blue {
-    background-color: blue;
-}
-
-.character-button.green {
-    background-color: green;
+/* Hahmon kuvien tyylit */
+.character-image {
+    width: 100px; /* Kuvan leveys */
+    height: 100px; /* Kuvan korkeus */
+    border-radius: 50%; /* Tee kuvasta ympyrä */
+    object-fit: cover; /* Säädä kuvan koko täyttämään ympyrä tasaisesti */
 }
 
 /* Aloitusnappi */
