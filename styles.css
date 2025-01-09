@@ -6,6 +6,20 @@ body {
     padding: 0;
 }
 
+canvas {
+    background-color: #b2dfdb;
+}
+#gameCanvas {
+    position: relative;
+}
+.score-display {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.2em;
+    color: #004d40;
+}
+
 #startScreen {
     display: flex;
     flex-direction: column;
@@ -25,4 +39,8 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#startGameButton:hover {
+    background-color: #00695c;
 }

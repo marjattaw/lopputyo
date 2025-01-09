@@ -5,9 +5,10 @@ const ctx = canvas.getContext("2d");
 // Pelin muuttujat
 let isGameRunning = false;
 let gravity = 0.5;
-let jumpPower = -12;
+let jumpPower = -15;
 let speed = 3;
 let score = 0;
+let obstacleSpawnRate = 0.005; // Todennäköisyys esteen ilmestymiselle
 
 // Pelaaja
 const player = {
@@ -33,10 +34,17 @@ const player = {
     }
 };
 
+// Laske pelaajan maksimihyppykaari
+function calculateJumpHeight() {
+    let jumpHeight = Math.abs(jumpPower) * (Math.abs(jumpPower) / (2 * gravity));
+    return jumpHeight;
+}
+
 // Esteet
 const obstacles = [];
 function createObstacle() {
-    const height = Math.random() * 50 + 20;
+    const maxObstacleHeight = Math.min(50, canvas.height / 4); // Maksimikorkeus esteelle asetettu matalaksi
+    const height = Math.random() * maxObstacleHeight + 20; // Esteiden korkeus 20 - maxObstacleHeight
     const obstacle = {
         x: canvas.width,
         y: canvas.height - height,
@@ -58,10 +66,10 @@ function createObstacle() {
 function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Piirrä pelaaja
+    // Piirä pelaaja
     player.draw();
 
-    // Piirrä esteet
+    // Piirä esteet
     obstacles.forEach(obstacle => {
         obstacle.draw();
     });
@@ -97,8 +105,13 @@ function updateGame() {
     });
 
     // Lisää este satunnaisesti
-    if (Math.random() < 0.01) {
+    if (Math.random() < obstacleSpawnRate) {
         createObstacle();
+    }
+
+    // Lisää haastetta ajan myötä
+    if (score % 10 === 0 && score > 0) {
+        obstacleSpawnRate += 0.001; // Lisää esteiden ilmestymistiheyttä
     }
 
     drawGame();
@@ -117,6 +130,7 @@ function startGame() {
     obstacles.length = 0;
     player.y = canvas.height - player.height;
     player.velocityY = 0;
+    obstacleSpawnRate = 0.005; // Palauta alkuperäinen ilmestymistiheys
     updateGame();
 }
 
