@@ -2,6 +2,12 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// Keskitetään canvas tyylillä
+document.getElementById("gameCanvas").style.margin = "auto";
+document.getElementById("gameCanvas").style.display = "block";
+document.getElementById("gameCanvas").style.position = "relative";
+document.getElementById("gameCanvas").style.top = "50px";
+
 // Pelin muuttujat
 let isGameRunning = false;
 let gravity = 0.5;
@@ -10,6 +16,23 @@ let speed = 3;
 let score = 0;
 let obstacleSpawnRate = 0.005; // Todennäköisyys esteen ilmestymiselle
 let selectedCharacter = null; // Ei valittua hahmoa alussa
+
+// Taustakuvat
+let backgroundImage;
+const backgroundImages = {
+    nala: "images/talvitaustakuva.png",
+    enzio: "images/kesätaustakuva.png"
+};
+
+// Esteiden kuvat
+const obstacleImages = {
+    nala: "images/nala_owner.png",
+    enzio: "images/enzio_owner.png"
+};
+
+// Taustan liikkumiseen liittyvät muuttujat
+let backgroundX = 0;
+const backgroundSpeed = 2;
 
 // Pelaaja
 const player = {
@@ -36,47 +59,57 @@ const player = {
 };
 
 // Hahmon valinta
-function selectCharacter(color) {
-    selectedCharacter = color;
-    player.color = selectedCharacter;
-    alert(`Valitsit hahmon: ${color}`);
+function selectCharacter(character) {
+    selectedCharacter = character;
+    player.color = character === "nala" ? "blue" : "green"; // Vaihda pelaajan väri
+    backgroundImage = backgroundImages[character]; // Aseta oikea tausta
+    console.log(`Hahmo valittu: ${character}`);
+    console.log("Taustakuva:", backgroundImage);
+    console.log("Esteen kuva:", obstacleImages[character]);
+    alert(`Valitsit hahmon: ${character}`);
 }
 
-// Aloita peli
-function startGame() {
-    if (!selectedCharacter) {
-        alert("Valitse hahmo ennen pelin aloittamista!");
-        return;
+// Piirrä tausta
+function drawBackground() {
+    const img = new Image();
+    img.src = backgroundImage;
+    ctx.drawImage(img, backgroundX, 0, canvas.width, canvas.height); // Ensimmäinen taustakuva
+    ctx.drawImage(img, backgroundX + canvas.width, 0, canvas.width, canvas.height); // Jatko
+
+    // Liikuta taustaa
+    backgroundX -= backgroundSpeed;
+    if (backgroundX <= -canvas.width) {
+        backgroundX = 0; // Resetoi taustan sijainti
     }
-    document.getElementById("startScreen").style.display = "none";
-    canvas.style.display = "block";
-    isGameRunning = true;
-    score = 0;
-    player.y = canvas.height - player.height;
-    player.velocityY = 0;
-    updateGame();
 }
 
 // Esteet
 const obstacles = [];
 function createObstacle() {
-    const maxObstacleHeight = Math.min(50, canvas.height / 4);
-    const height = Math.random() * maxObstacleHeight + 20;
-    const obstacle = {
-        x: canvas.width,
-        y: canvas.height - height,
-        width: 20,
-        height: height,
-        color: "red",
-        draw() {
-            ctx.fillStyle = this.color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        },
-        update() {
-            this.x -= speed;
-        }
+    const img = new Image();
+    img.src = obstacleImages[selectedCharacter]; // Aseta esteiden kuva hahmon mukaan
+    img.onload = () => {
+        console.log(`Kuva ladattu: ${img.src}`);
+        const height = 80; // Kiinteä korkeus esteille
+        const width = 80; // Kiinteä leveys esteille
+        const obstacle = {
+            x: canvas.width,
+            y: canvas.height - height,
+            width: width,
+            height: height,
+            image: img,
+            draw() {
+                ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            },
+            update() {
+                this.x -= speed;
+            }
+        };
+        obstacles.push(obstacle);
     };
-    obstacles.push(obstacle);
+    img.onerror = () => {
+        console.error(`Kuvaa ei voitu ladata: ${img.src}`);
+    };
 }
 
 // Piirrä peli
@@ -99,6 +132,7 @@ function drawGame() {
 
 // Päivitä peli
 function updateGame() {
+    drawBackground(); // Piirrä tausta ennen muita elementtejä
     player.update();
 
     obstacles.forEach((obstacle, index) => {
@@ -133,13 +167,41 @@ function updateGame() {
     }
 }
 
+// Aloita peli
+function startGame() {
+    if (!selectedCharacter) {
+        alert("Valitse hahmo ennen pelin aloittamista!");
+        return;
+    }
+    document.getElementById("startScreen").style.display = "none";
+    canvas.style.display = "block";
+    isGameRunning = true;
+    score = 0;
+    player.y = canvas.height - player.height;
+    player.velocityY = 0;
+    updateGame();
+}
+
 // Lopeta peli
 function stopGame() {
     isGameRunning = false;
     alert(`Peli päättyi! Lopulliset pisteet: ${score}`);
+    resetGame(); // Resetoi pelin tila
     document.getElementById("startScreen").style.display = "flex";
     canvas.style.display = "none";
 }
+
+// Resetoi peli
+function resetGame() {
+    selectedCharacter = null; // Poista hahmon valinta
+    score = 0; // Nollaa pisteet
+    backgroundX = 0; // Resetoi taustan sijainti
+    obstacles.length = 0; // Tyhjennä esteet
+    player.y = canvas.height - player.height; // Palauta pelaajan sijainti
+    player.velocityY = 0; // Nollaa pelaajan nopeus
+    backgroundImage = null; // Poista taustakuva
+}
+
 
 // Kuuntele näppäimistöä
 window.addEventListener("keydown", (e) => {
@@ -147,6 +209,3 @@ window.addEventListener("keydown", (e) => {
         player.velocityY = jumpPower;
     }
 });
-
-// Aloitusnapin kuuntelija
-document.getElementById("startGameButton").addEventListener("click", startGame);
