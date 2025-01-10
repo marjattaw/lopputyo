@@ -3,10 +3,10 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Keskitetään canvas tyylillä
-document.getElementById("gameCanvas").style.margin = "auto";
-document.getElementById("gameCanvas").style.display = "block";
-document.getElementById("gameCanvas").style.position = "relative";
-document.getElementById("gameCanvas").style.top = "50px";
+canvas.style.margin = "auto";
+canvas.style.display = "block";
+canvas.style.position = "relative";
+canvas.style.top = "50px";
 
 // Pelin muuttujat
 let isGameRunning = false;
@@ -17,11 +17,11 @@ let score = 0;
 let obstacleSpawnRate = 0.005; // Todennäköisyys esteen ilmestymiselle
 let selectedCharacter = null; // Ei valittua hahmoa alussa
 
-// Taustakuvat
-let backgroundImage;
+// Taustakuva
+let backgroundImageFar;
 const backgroundImages = {
-    nala: "images/talvitaustakuva.png",
-    enzio: "images/kesätaustakuva.png"
+    nala: "images/talvitausta_far.png",
+    enzio: "images/kesatausta_far.png"
 };
 
 // Esteiden kuvat
@@ -31,8 +31,8 @@ const obstacleImages = {
 };
 
 // Taustan liikkumiseen liittyvät muuttujat
-let backgroundX = 0;
-const backgroundSpeed = 2;
+let backgroundXFar = 0; // Kaukainen tausta
+const backgroundSpeedFar = 2; // Kaukainen taustan nopeus
 
 // Pelaaja
 const player = {
@@ -62,24 +62,27 @@ const player = {
 function selectCharacter(character) {
     selectedCharacter = character;
     player.color = character === "nala" ? "blue" : "green"; // Vaihda pelaajan väri
-    backgroundImage = backgroundImages[character]; // Aseta oikea tausta
+    backgroundImageFar = backgroundImages[character]; // Aseta oikea kaukainen tausta
     console.log(`Hahmo valittu: ${character}`);
-    console.log("Taustakuva:", backgroundImage);
-    console.log("Esteen kuva:", obstacleImages[character]);
+    console.log("Kaukainen taustakuva:", backgroundImageFar);
     alert(`Valitsit hahmon: ${character}`);
 }
 
 // Piirrä tausta
 function drawBackground() {
-    const img = new Image();
-    img.src = backgroundImage;
-    ctx.drawImage(img, backgroundX, 0, canvas.width, canvas.height); // Ensimmäinen taustakuva
-    ctx.drawImage(img, backgroundX + canvas.width, 0, canvas.width, canvas.height); // Jatko
+    const imgFar = new Image();
+    imgFar.src = backgroundImageFar;
+
+    // Piirrä kaukainen tausta kahdesti
+    ctx.drawImage(imgFar, backgroundXFar, 0, canvas.width, canvas.height);
+    ctx.drawImage(imgFar, backgroundXFar + canvas.width, 0, canvas.width, canvas.height);
 
     // Liikuta taustaa
-    backgroundX -= backgroundSpeed;
-    if (backgroundX <= -canvas.width) {
-        backgroundX = 0; // Resetoi taustan sijainti
+    backgroundXFar -= backgroundSpeedFar;
+
+    // Resetoi sijainti, kun tausta siirtyy kokonaan ulos
+    if (backgroundXFar <= -canvas.width) {
+        backgroundXFar = 0;
     }
 }
 
@@ -89,7 +92,6 @@ function createObstacle() {
     const img = new Image();
     img.src = obstacleImages[selectedCharacter]; // Aseta esteiden kuva hahmon mukaan
     img.onload = () => {
-        console.log(`Kuva ladattu: ${img.src}`);
         const height = 80; // Kiinteä korkeus esteille
         const width = 80; // Kiinteä leveys esteille
         const obstacle = {
@@ -107,16 +109,10 @@ function createObstacle() {
         };
         obstacles.push(obstacle);
     };
-    img.onerror = () => {
-        console.error(`Kuvaa ei voitu ladata: ${img.src}`);
-    };
 }
 
 // Piirrä peli
 function drawGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Piirrä pelaaja
     player.draw();
 
     // Piirrä esteet
@@ -132,6 +128,7 @@ function drawGame() {
 
 // Päivitä peli
 function updateGame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground(); // Piirrä tausta ennen muita elementtejä
     player.update();
 
@@ -186,22 +183,20 @@ function startGame() {
 function stopGame() {
     isGameRunning = false;
     alert(`Peli päättyi! Lopulliset pisteet: ${score}`);
-    resetGame(); // Resetoi pelin tila
+    resetGame();
     document.getElementById("startScreen").style.display = "flex";
     canvas.style.display = "none";
 }
 
 // Resetoi peli
 function resetGame() {
-    selectedCharacter = null; // Poista hahmon valinta
-    score = 0; // Nollaa pisteet
-    backgroundX = 0; // Resetoi taustan sijainti
-    obstacles.length = 0; // Tyhjennä esteet
-    player.y = canvas.height - player.height; // Palauta pelaajan sijainti
-    player.velocityY = 0; // Nollaa pelaajan nopeus
-    backgroundImage = null; // Poista taustakuva
+    selectedCharacter = null;
+    score = 0;
+    backgroundXFar = 0;
+    obstacles.length = 0;
+    player.y = canvas.height - player.height;
+    player.velocityY = 0;
 }
-
 
 // Kuuntele näppäimistöä
 window.addEventListener("keydown", (e) => {

@@ -7,10 +7,24 @@ body {
     padding: 0;
 }
 
+/* Aloitusruutu */
+#startScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #00796b; /* Palautetaan taustaväri */
+    color: white; /* Tekstin väri */
+}
+
+/* Pelialueen taustakuva */
 canvas {
-    background-color: #b2dfdb;
+    width: 90%;
+    max-width: 800px;
+    height: auto;
+    margin: 0 auto;
     display: block;
-    margin: auto;
     position: relative;
     top: 50px;
 }
@@ -20,48 +34,38 @@ canvas {
     position: absolute;
     top: 10px;
     left: 10px;
-    font-size: 1.2em;
+    font-size: 1.5em;
     color: #004d40;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid #004d40;
 }
 
-/* Aloitusruutu */
-#startScreen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #00796b;
-    color: white;
-}
-
-/* Hahmovalinnan kontti */
-.character-selection {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-/* Hahmon valintanapin tyylit */
+/* Hahmon valintanappi ja hover-efekti */
 .character-button {
-    background: none; /* Ei taustaväriä */
-    border: none; /* Ei reunaviivaa */
-    padding: 0; /* Ei sisämarginaalia */
-    cursor: pointer; /* Vaihda osoitin käden kuvaksi hoverissa */
-    transition: transform 0.2s ease; /* Lisää pieni skaalausanimaatio */
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
 .character-button:hover {
-    transform: scale(1.1); /* Kasvata kokoa hieman hoverissa */
+    transform: scale(1.1);
 }
 
-/* Hahmon kuvien tyylit */
 .character-image {
-    width: 100px; /* Kuvan leveys */
-    height: 100px; /* Kuvan korkeus */
-    border-radius: 50%; /* Tee kuvasta ympyrä */
-    object-fit: cover; /* Säädä kuvan koko täyttämään ympyrä tasaisesti */
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.character-button:hover .character-image {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
 }
 
 /* Aloitusnappi */
@@ -74,9 +78,11 @@ canvas {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 #startGameButton:hover {
     background-color: #00695c;
+    transform: scale(1.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
