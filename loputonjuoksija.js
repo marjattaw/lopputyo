@@ -10,8 +10,8 @@ canvas.style.top = "50px";
 
 // Pelin muuttujat
 let isGameRunning = false;
-let gravity = 0.5;
-let jumpPower = -15;
+let gravity = 0.4;
+let jumpPower = -20;
 let speed = 3;
 let score = 0;
 let obstacleSpawnRate = 0.005; // Todennäköisyys esteen ilmestymiselle
@@ -92,7 +92,7 @@ function createObstacle() {
     const img = new Image();
     img.src = obstacleImages[selectedCharacter]; // Aseta esteiden kuva hahmon mukaan
     img.onload = () => {
-        const height = 80; // Kiinteä korkeus esteille
+        const height = 90; // Kiinteä korkeus esteille
         const width = 80; // Kiinteä leveys esteille
         const obstacle = {
             x: canvas.width,
