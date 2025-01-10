@@ -63,10 +63,16 @@ const player = {
 function selectCharacter(character) {
     selectedCharacter = character;
 
-    // Aseta oikea hahmon kuva
+    // Poista korostus kaikilta hahmoilta
+    document.getElementById("nalaButton").classList.remove("active-character");
+    document.getElementById("enzioButton").classList.remove("active-character");
+
+    // Lisää korostus valittuun hahmoon
     if (character === "nala") {
+        document.getElementById("nalaButton").classList.add("active-character");
         player.image = "images/nala.png"; // Nalan hahmokuva
     } else if (character === "enzio") {
+        document.getElementById("enzioButton").classList.add("active-character");
         player.image = "images/enzio.png"; // Enzion hahmokuva
     }
 
@@ -74,8 +80,6 @@ function selectCharacter(character) {
     backgroundImageFar = backgroundImages[character];
 
     console.log(`Hahmo valittu: ${character}`);
-    console.log("Kaukainen taustakuva:", backgroundImageFar);
-    alert(`Valitsit hahmon: ${character}`);
 }
 
 // Piirrä tausta
