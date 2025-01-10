@@ -37,14 +37,15 @@ const backgroundSpeedFar = 2; // Kaukainen taustan nopeus
 // Pelaaja
 const player = {
     x: 50,
-    y: canvas.height - 60,
-    width: 50,
-    height: 50,
-    color: "blue",
+    y: canvas.height - 150, // Säädetty korkeammalle
+    width: 100, // Pelaajan kuvan leveys
+    height: 150, // Pelaajan kuvan korkeus
     velocityY: 0,
+    image: null, // Pelaajan kuva alustetaan hahmon valinnassa
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        const img = new Image();
+        img.src = this.image; // Pelaajan kuva
+        ctx.drawImage(img, this.x, this.y, this.width, this.height); // Piirrä pelaajan kuva
     },
     update() {
         this.y += this.velocityY;
@@ -61,8 +62,17 @@ const player = {
 // Hahmon valinta
 function selectCharacter(character) {
     selectedCharacter = character;
-    player.color = character === "nala" ? "blue" : "green"; // Vaihda pelaajan väri
-    backgroundImageFar = backgroundImages[character]; // Aseta oikea kaukainen tausta
+
+    // Aseta oikea hahmon kuva
+    if (character === "nala") {
+        player.image = "images/nala.png"; // Nalan hahmokuva
+    } else if (character === "enzio") {
+        player.image = "images/enzio.png"; // Enzion hahmokuva
+    }
+
+    // Aseta oikea taustakuva
+    backgroundImageFar = backgroundImages[character];
+
     console.log(`Hahmo valittu: ${character}`);
     console.log("Kaukainen taustakuva:", backgroundImageFar);
     alert(`Valitsit hahmon: ${character}`);
