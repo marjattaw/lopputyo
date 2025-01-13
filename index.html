@@ -9,8 +9,14 @@
 <body>
     <!-- Aloitusruutu -->
     <div id="startScreen">
-        <h2>Nalan ja Enzion pakoretki</h2>
-        <p>Valitse hahmo:</p>
+        <h2>ENZION JA NALAN PAKORETKIPELI</h2>
+        <p>Tehtävänäsi on auttaa Enziota tai Nalaa pakenemaan!</p><br>
+        <ul>
+            <li>Väistele esteitä hyppäämällä (välilyöntinäppäimellä) niiden yli.</li>
+            <li>Tuplahyppy aktivoituu kun hyppäät esteen yli ja pidät välilyöntiä pohjassa.</li>
+            <li>Kerää pisteitä jokaisesta onnistuneesta hypystä.</li>
+            <li>Peli loppuu, jos törmäät esteeseen.</li>
+        </ul><br>
         <div class="character-selection">
             <!-- Enzion painike -->
             <button id="enzioButton" onclick="selectCharacter('enzio')" class="character-button">
@@ -25,7 +31,7 @@
     </div>
     
     <!-- Canvas -->
-    <canvas id="gameCanvas" width="800" height="400" style="display: none; border: 1px solid black;"></canvas>
+    <canvas id="gameCanvas" width="1200" height="600" style="display: none; border: 1px solid black;"></canvas>
 
     <!-- Pelilogiikan JavaScript -->
     <script src="loputonjuoksija.js"></script>

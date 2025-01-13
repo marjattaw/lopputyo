@@ -2,6 +2,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// Päivitä canvasin koko
+canvas.width = 1200; // Uusi leveys
+canvas.height = 600; // Uusi korkeus
+
 // Keskitetään canvas tyylillä
 canvas.style.margin = "auto";
 canvas.style.display = "block";
@@ -12,10 +16,13 @@ canvas.style.top = "50px";
 let isGameRunning = false;
 let gravity = 0.4;
 let jumpPower = -20;
-let speed = 3;
+let speed = 4; // Nopeutettu hieman isommalle pelialueelle
 let score = 0;
-let obstacleSpawnRate = 0.005; // Todennäköisyys esteen ilmestymiselle
-let selectedCharacter = null; // Ei valittua hahmoa alussa
+let obstacleSpawnRate = 0.002; // Todennäköisyys esteen ilmestymiselle
+let selectedCharacter = null;
+
+// Pelaajan hyppyjen määrä
+let jumpCount = 0;
 
 // Taustakuva
 let backgroundImageFar;
@@ -31,21 +38,21 @@ const obstacleImages = {
 };
 
 // Taustan liikkumiseen liittyvät muuttujat
-let backgroundXFar = 0; // Kaukainen tausta
-const backgroundSpeedFar = 2; // Kaukainen taustan nopeus
+let backgroundXFar = 0; 
+const backgroundSpeedFar = 3;
 
 // Pelaaja
 const player = {
-    x: 50,
-    y: canvas.height - 150, // Säädetty korkeammalle
-    width: 100, // Pelaajan kuvan leveys
-    height: 150, // Pelaajan kuvan korkeus
+    x: 100, // Pelaaja siirtyy hieman oikealle suuremmalla pelialueella
+    y: canvas.height - 180, 
+    width: 120, 
+    height: 160, 
     velocityY: 0,
-    image: null, // Pelaajan kuva alustetaan hahmon valinnassa
+    image: null, 
     draw() {
         const img = new Image();
-        img.src = this.image; // Pelaajan kuva
-        ctx.drawImage(img, this.x, this.y, this.width, this.height); // Piirrä pelaajan kuva
+        img.src = this.image; 
+        ctx.drawImage(img, this.x, this.y, this.width, this.height); 
     },
     update() {
         this.y += this.velocityY;
@@ -55,6 +62,13 @@ const player = {
         if (this.y > canvas.height - this.height) {
             this.y = canvas.height - this.height;
             this.velocityY = 0;
+            jumpCount = 0; 
+        }
+
+        // Estä pelaajaa menemästä katosta läpi
+        if (this.y < 0) {
+            this.y = 0;
+            this.velocityY = 0; 
         }
     }
 };
@@ -63,22 +77,18 @@ const player = {
 function selectCharacter(character) {
     selectedCharacter = character;
 
-    // Poista korostus kaikilta hahmoilta
     document.getElementById("nalaButton").classList.remove("active-character");
     document.getElementById("enzioButton").classList.remove("active-character");
 
-    // Lisää korostus valittuun hahmoon
     if (character === "nala") {
         document.getElementById("nalaButton").classList.add("active-character");
-        player.image = "images/nala.png"; // Nalan hahmokuva
+        player.image = "images/nala.png"; 
     } else if (character === "enzio") {
         document.getElementById("enzioButton").classList.add("active-character");
-        player.image = "images/enzio.png"; // Enzion hahmokuva
+        player.image = "images/enzio.png"; 
     }
 
-    // Aseta oikea taustakuva
     backgroundImageFar = backgroundImages[character];
-
     console.log(`Hahmo valittu: ${character}`);
 }
 
@@ -87,14 +97,11 @@ function drawBackground() {
     const imgFar = new Image();
     imgFar.src = backgroundImageFar;
 
-    // Piirrä kaukainen tausta kahdesti
     ctx.drawImage(imgFar, backgroundXFar, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFar, backgroundXFar + canvas.width, 0, canvas.width, canvas.height);
 
-    // Liikuta taustaa
     backgroundXFar -= backgroundSpeedFar;
 
-    // Resetoi sijainti, kun tausta siirtyy kokonaan ulos
     if (backgroundXFar <= -canvas.width) {
         backgroundXFar = 0;
     }
@@ -104,10 +111,10 @@ function drawBackground() {
 const obstacles = [];
 function createObstacle() {
     const img = new Image();
-    img.src = obstacleImages[selectedCharacter]; // Aseta esteiden kuva hahmon mukaan
+    img.src = obstacleImages[selectedCharacter]; 
     img.onload = () => {
-        const height = 90; // Kiinteä korkeus esteille
-        const width = 80; // Kiinteä leveys esteille
+        const height = 120; 
+        const width = 100; 
         const obstacle = {
             x: canvas.width,
             y: canvas.height - height,
@@ -129,12 +136,10 @@ function createObstacle() {
 function drawGame() {
     player.draw();
 
-    // Piirrä esteet
     obstacles.forEach(obstacle => {
         obstacle.draw();
     });
 
-    // Näytä pisteet
     ctx.fillStyle = "black";
     ctx.font = "20px Arial";
     ctx.fillText(`Pisteet: ${score}`, 10, 20);
@@ -143,18 +148,34 @@ function drawGame() {
 // Päivitä peli
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground(); // Piirrä tausta ennen muita elementtejä
+    drawBackground(); 
     player.update();
 
     obstacles.forEach((obstacle, index) => {
         obstacle.update();
 
-        // Törmäystarkistus
+        // Pelaajan törmäyslaatikon määrittely
+        const playerCollisionBox = {
+            x: player.x + 20, // Pelaajan laatikon vasen reuna
+            y: player.y + 20, // Pelaajan laatikon yläreuna
+            width: player.width - 40, // Pelaajan laatikon leveys
+            height: player.height - 40 // Pelaajan laatikon korkeus
+        };
+
+        // Esteen törmäyslaatikon määrittely
+        const obstacleCollisionBox = {
+            x: obstacle.x + 10, // Esteen laatikon vasen reuna
+            y: obstacle.y + 10, // Esteen laatikon yläreuna
+            width: obstacle.width - 20, // Esteen laatikon leveys
+            height: obstacle.height - 20 // Esteen laatikon korkeus
+        };
+
+        // Tarkista törmäys rajatuilla alueilla
         if (
-            player.x < obstacle.x + obstacle.width &&
-            player.x + player.width > obstacle.x &&
-            player.y < obstacle.y + obstacle.height &&
-            player.y + player.height > obstacle.y
+            playerCollisionBox.x < obstacleCollisionBox.x + obstacleCollisionBox.width &&
+            playerCollisionBox.x + playerCollisionBox.width > obstacleCollisionBox.x &&
+            playerCollisionBox.y < obstacleCollisionBox.y + obstacleCollisionBox.height &&
+            playerCollisionBox.y + playerCollisionBox.height > obstacleCollisionBox.y
         ) {
             stopGame();
         }
@@ -166,7 +187,6 @@ function updateGame() {
         }
     });
 
-    // Lisää este satunnaisesti
     if (Math.random() < obstacleSpawnRate) {
         createObstacle();
     }
@@ -214,7 +234,8 @@ function resetGame() {
 
 // Kuuntele näppäimistöä
 window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" && player.y === canvas.height - player.height) {
+    if (e.code === "Space" && jumpCount < 2) { 
         player.velocityY = jumpPower;
+        jumpCount++; 
     }
 });
